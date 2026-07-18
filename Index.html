@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solusi Dana Cepat — Kalkulator Pinjaman</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --card:#FAF9F7;
+    --card-2:#F1EEF9;
+    --purple:#3B1268;
+    --purple-soft:#5B2FA0;
+    --gold:#C9963E;
+    --mint:#3FA576;
+    --ink:#1C1C1C;
+    --ink-dim:#6E6E76;
+    --line: rgba(28,28,28,0.10);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 15% -10%, rgba(59,18,104,0.06), transparent 45%),
+      radial-gradient(ellipse at 100% 0%, rgba(201,150,62,0.07), transparent 40%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Plus Jakarta Sans', sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:32px 16px 64px;
+  }
+  .wrap{ width:100%; max-width:460px; }
+  header{ text-align:center; margin-bottom:28px; }
+  .brand{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:1.7rem;
+    letter-spacing:-0.01em;
+    color:var(--purple);
+  }
+  .brand span{ color:var(--gold); font-style:italic; }
+  .tagline{
+    color:var(--ink-dim);
+    font-size:0.85rem;
+    margin-top:6px;
+    letter-spacing:0.02em;
+  }
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:24px 22px;
+    margin-bottom:20px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.03);
+  }
+  .label-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:10px;
+  }
+  .label{ font-size:0.78rem; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.08em; }
+
+  .amount-input-row{
+    display:flex; align-items:center;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:12px;
+    padding:10px 14px;
+    margin-top:6px;
+    transition:border-color 0.15s ease;
+  }
+  .amount-input-row:focus-within{ border-color:var(--purple-soft); }
+  .amount-prefix{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    color:var(--ink-dim);
+    margin-right:6px;
+    font-size:1.3rem;
+  }
+  #amountInput{
+    border:none; outline:none; background:transparent;
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1.6rem;
+    color:var(--purple);
+    width:100%;
+    -moz-appearance:textfield;
+  }
+  #amountInput::-webkit-outer-spin-button,
+  #amountInput::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .range-caps{ display:flex; justify-content:space-between; font-size:0.72rem; color:var(--ink-dim); margin-top:8px; }
+  .amount-hint{ font-size:0.72rem; color:var(--ink-dim); margin-top:6px; }
+  .amount-hint.warn{ color:#B3451E; }
+
+  .tenor-grid{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:8px;
+    margin-top:12px;
+  }
+  .tenor-btn{
+    background:var(--card-2);
+    border:1px solid var(--line);
+    color:var(--ink);
+    padding:10px 0;
+    border-radius:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    cursor:pointer;
+    transition:all 0.15s ease;
+  }
+  .tenor-btn:hover{ border-color:var(--purple-soft); }
+  .tenor-btn.active{
+    background:var(--purple);
+    color:#fff;
+    border-color:var(--purple);
+    font-weight:600;
+  }
+
+  /* Receipt / struk */
+  .receipt{
+    background:#fff;
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:26px 22px 22px;
+    position:relative;
+    font-family:'IBM Plex Mono', monospace;
+    box-shadow:0 20px 40px -16px rgba(59,18,104,0.15);
+  }
+  .receipt::before, .receipt::after{
+    content:"";
+    position:absolute; left:0; right:0; height:14px;
+    background:
+      radial-gradient(circle at 10px 0, transparent 7px, var(--bg) 7.5px) repeat-x;
+    background-size:20px 14px;
+  }
+  .receipt::before{ top:-1px; transform:rotate(180deg); }
+  .receipt::after{ bottom:-1px; }
+  .receipt-head{
+    text-align:center;
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:1.05rem;
+    letter-spacing:0.02em;
+    color:var(--purple);
+    margin-bottom:2px;
+  }
+  .receipt-sub{ text-align:center; font-size:0.68rem; color:var(--ink-dim); margin-bottom:16px; }
+  .dash{ border-top:1px dashed #ccc; margin:14px 0; }
+  .row{ display:flex; justify-content:space-between; font-size:0.85rem; padding:5px 0; }
+  .row .k{ color:#666; }
+  .row .v{ font-weight:500; }
+  .row.total{ font-size:1.05rem; font-weight:700; padding-top:10px; }
+  .row.total .v{ color:var(--purple); }
+  .cicilan-box{
+    background:var(--card-2);
+    border-radius:8px;
+    padding:14px 16px;
+    margin:16px 0 4px;
+    text-align:center;
+  }
+  .cicilan-box .k{ font-size:0.68rem; color:var(--ink-dim); text-transform:uppercase; letter-spacing:0.06em; }
+  .cicilan-box .v{ font-size:1.5rem; font-weight:700; color:var(--purple); margin-top:2px; }
+  .cicilan-box .n{ font-size:0.68rem; color:var(--ink-dim); margin-top:2px; }
+
+  .denda-box{
+    display:flex; align-items:center; gap:10px;
+    background:#FFF4E9;
+    border:1px solid #F0D6B0;
+    border-radius:10px;
+    padding:12px 14px;
+    margin-top:16px;
+    font-family:'Plus Jakarta Sans', sans-serif;
+  }
+  .denda-box .ic{ font-size:1.1rem; }
+  .denda-box .txt{ font-size:0.78rem; color:#8A5A1E; line-height:1.4; }
+  .denda-box b{ color:#B3451E; }
+
+  .wa-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%;
+    background:var(--mint);
+    color:#fff;
+    font-weight:700;
+    font-size:0.95rem;
+    padding:15px 0;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    margin-top:18px;
+    transition:transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .wa-btn:hover{ transform:translateY(-1px); box-shadow:0 8px 20px -6px rgba(63,165,118,0.4); }
+  .wa-btn:active{ transform:translateY(0); }
+
+  .footnote{
+    text-align:center;
+    font-size:0.72rem;
+    color:var(--ink-dim);
+    margin-top:18px;
+    line-height:1.5;
+  }
+  .footnote b{ color:var(--purple); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">Solusi Dana <span>Cepat</span></div>
+    <div class="tagline">Kalkulator simulasi pinjaman — transparan, tanpa jebakan</div>
+  </header>
+
+  <div class="panel">
+    <div class="label-row">
+      <span class="label">Jumlah Plafon</span>
+    </div>
+    <div class="amount-input-row">
+      <span class="amount-prefix">Rp</span>
+      <input type="number" id="amountInput" value="1000000" min="1000000" max="20000000" step="100000" inputmode="numeric">
+    </div>
+    <div class="range-caps"><span>Min Rp 1.000.000</span><span>Maks Rp 20.000.000</span></div>
+    <div class="amount-hint" id="amountHint"></div>
+
+    <div style="margin-top:22px;">
+      <span class="label">Tenor (bulan)</span>
+      <div class="tenor-grid" id="tenorGrid"></div>
+    </div>
+  </div>
+
+  <div class="receipt">
+    <div class="receipt-head">STRUK SIMULASI</div>
+    <div class="receipt-sub">Solusi Dana Cepat</div>
+    <div class="row"><span class="k">Plafon Pinjaman</span><span class="v" id="rPokok">-</span></div>
+    <div class="row"><span class="k">Tenor</span><span class="v" id="rTenor">-</span></div>
+    <div class="dash"></div>
+    <div class="row"><span class="k">Pokok / bulan</span><span class="v" id="rPokokBulan">-</span></div>
+    <div class="row"><span class="k">Bunga 5% dari plafon / bulan</span><span class="v" id="rBunga">-</span></div>
+    <div class="row"><span class="k">Admin / bulan</span><span class="v" id="rAdmin">-</span></div>
+
+    <div class="cicilan-box">
+      <div class="k">Cicilan per Bulan</div>
+      <div class="v" id="rCicilan">-</div>
+      <div class="n">dibayar tiap bulan, jumlah sama tiap tenor</div>
+    </div>
+
+    <div class="dash"></div>
+    <div class="row total"><span class="k">Total Pelunasan</span><span class="v" id="rTotal">-</span></div>
+
+    <div class="denda-box">
+      <span class="ic">⚠️</span>
+      <span class="txt">Denda keterlambatan <b>Rp 50.000 / hari</b> dihitung sejak tanggal jatuh tempo cicilan.</span>
+    </div>
+  </div>
+
+  <button class="wa-btn" id="waBtn">
+    Ajukan via WhatsApp
+  </button>
+
+  <div class="footnote">
+    Simulasi ini bersifat estimasi. Angka final mengikuti kesepakatan dengan <b>Solusi Dana Cepat</b>.
+  </div>
+</div>
+
+<script>
+  const rupiah = n => 'Rp ' + Math.round(n).toLocaleString('id-ID');
+  const roundUp1000 = n => Math.ceil(n / 1000) * 1000;
+
+  const amountInput = document.getElementById('amountInput');
+  const amountHint = document.getElementById('amountHint');
+  const tenorGrid = document.getElementById('tenorGrid');
+  const tenors = [1,2,3,4,5,6,7,8,9,10];
+  let selectedTenor = 2;
+  const MIN_AMOUNT = 1000000;
+  const MAX_AMOUNT = 20000000;
+
+  tenors.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tenor-btn' + (t === selectedTenor ? ' active' : '');
+    btn.textContent = t;
+    btn.dataset.tenor = t;
+    btn.addEventListener('click', () => {
+      selectedTenor = t;
+      document.querySelectorAll('.tenor-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      calculate();
+    });
+    tenorGrid.appendChild(btn);
+  });
+
+  // Nomor WhatsApp bisnis Solusi Dana Cepat
+  const WA_NUMBER = '36702654419';
+
+  function getClampedAmount(){
+    let val = parseInt(amountInput.value, 10);
+    if (isNaN(val)) val = MIN_AMOUNT;
+    if (val < MIN_AMOUNT){
+      amountHint.textContent = `Minimum plafon Rp 1.000.000`;
+      amountHint.classList.add('warn');
+    } else if (val > MAX_AMOUNT){
+      amountHint.textContent = `Maksimum plafon Rp 20.000.000`;
+      amountHint.classList.add('warn');
+    } else {
+      amountHint.textContent = '';
+      amountHint.classList.remove('warn');
+    }
+    return Math.min(Math.max(val, MIN_AMOUNT), MAX_AMOUNT);
+  }
+
+  function calculate(){
+    const pokok = getClampedAmount();
+    const tenor = selectedTenor;
+
+    const pokokBulan = roundUp1000(pokok / tenor);
+    const bunga = pokok * 0.05;
+    const admin = 50000;
+    const cicilan = pokokBulan + bunga + admin;
+    const total = cicilan * tenor;
+
+    document.getElementById('rPokok').textContent = rupiah(pokok);
+    document.getElementById('rTenor').textContent = tenor + ' bulan';
+    document.getElementById('rPokokBulan').textContent = rupiah(pokokBulan);
+    document.getElementById('rBunga').textContent = rupiah(bunga);
+    document.getElementById('rAdmin').textContent = rupiah(admin);
+    document.getElementById('rCicilan').textContent = rupiah(cicilan);
+    document.getElementById('rTotal').textContent = rupiah(total);
+
+    const msg = `Halo Solusi Dana Cepat, saya ingin mengajukan pinjaman:%0A` +
+      `Plafon: ${rupiah(pokok)}%0A` +
+      `Tenor: ${tenor} bulan%0A` +
+      `Cicilan per bulan: ${rupiah(cicilan)}%0A` +
+      `Total pelunasan: ${rupiah(total)}`;
+    document.getElementById('waBtn').onclick = () => {
+      window.open(`https://wa.me/${WA_NUMBER}?text=${msg}`, '_blank');
+    };
+  }
+
+  amountInput.addEventListener('input', calculate);
+  amountInput.addEventListener('blur', () => {
+    amountInput.value = getClampedAmount();
+    calculate();
+  });
+  calculate();
+</script>
+</body>
+</html>
